@@ -146,6 +146,25 @@ public class PopFace
 		FlushDebug();
 	}
 
+	public string PopData()
+	{
+		//	gr: through trial and error, windows 7, unity 5.20f3 doesn't modify the buffer if the buffersize is over N(not 641 as first thought)
+		StringBuilder StringBuffer = new StringBuilder(256);
+		var OrigLength = PopFace_PopData( mInstance, StringBuffer, (uint)StringBuffer.Capacity );
+
+		//	out of sources (negative on error)
+		if (OrigLength <= 0)
+			return null;
+
+		string Source = StringBuffer.ToString();
+
+		//	warning if we clipped!
+		if (OrigLength > StringBuffer.Capacity)
+			Debug.LogWarning("Filename from PopMovie_EnumSource was clipped; " + StringBuffer.Capacity + "/" + OrigLength + "; " + Source);
+
+		return Source;
+	}
+
 	static public string GetVersion()
 	{
 		return "GIT_REVISION";
