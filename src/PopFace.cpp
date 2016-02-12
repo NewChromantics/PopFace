@@ -2,6 +2,9 @@
 #include "PopUnity.h"
 #include "TFaceDetector.h"
 
+#if defined(TARGET_OSX) || defined(TARGET_IOS)
+#include "CoreImageFaceDetector.h"
+#endif
 
 namespace PopFace
 {
@@ -174,18 +177,28 @@ PopFace::TInstance::TInstance(const TInstanceRef& Ref,TFaceDetectorParams Params
 	mRef			( Ref ),
 	mOpenglContext	( OpenglContext )
 {
-	throw Soy::AssertException("todo");
+#if defined(TARGET_OSX) || defined(TARGET_IOS)
+	mDetector.reset( new CoreImageFaceDetector( Params, OpenglContext ) );
+#else
+	throw Soy::AssertException("unsupported on this platform");
+#endif
 }
 
 void PopFace::TInstance::PushTexture(Opengl::TTexture Texture)
 {
-	throw Soy::AssertException("todo");
+	auto Detector = mDetector;
+	Soy::Assert( Detector != nullptr, "No detector");
+	
+	Detector->PushTexture( Texture );
 }
 
 
 void PopFace::TInstance::PopData(std::stringstream& Data)
 {
-	throw Soy::AssertException("todo");
+	auto Detector = mDetector;
+	Soy::Assert( Detector != nullptr, "No detector");
+	
+	Detector->PopData( Data );
 }
 
 
